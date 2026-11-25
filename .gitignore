@@ -1,0 +1,7 @@
+target/
+logs/
+data/src/
+data/variants/
+data/live/
+*.class
+.DS_Store
