@@ -37,8 +37,13 @@ seg_stat() { # 输出 segmentReq/cacheHit/cacheMiss
 }
 
 # 换一套切片参数上线（等价于控制台改转码模板后刷新边缘缓存）
+# 旧目录只移走不清空：rm -rf 在上百个小分片的目录上既慢又容易被误伤，移到 $SWAP 交给系统回收。
+SWAP=${SWAP:-/tmp/volc-live-swap}
+mkdir -p "$SWAP"
 use_variant() {
-  rm -rf "$LIVE/$2"
+  if [ -d "$LIVE/$2" ]; then
+    mv "$LIVE/$2" "$SWAP/$2.$(date +%s%N)"
+  fi
   cp -R "$VAR/$1" "$LIVE/$2"
   curl -s "$EDGE/admin/reload" > /dev/null
 }
